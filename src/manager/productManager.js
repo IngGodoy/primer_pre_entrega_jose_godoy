@@ -19,15 +19,14 @@ class ProductManager {
     };
   };
 
-  async addProduct(title, description, price, thumbnail, code, stock) {
+  async addProduct(newProduct) {
 
+    const {title, description, price, thumbnail, code, stock} = newProduct 
     try {
-     
     const products = await this.getProducts();  
-
     //verificar codigo del producto
     const checkCode = products.find((product)=> product.code === code);
-    console.log("verificación de codigo: ",checkCode) //error
+    console.log("verificación de codigo: ",checkCode) //error.,
     if (checkCode){
       return "product code error";
     };
@@ -42,6 +41,8 @@ class ProductManager {
       stock: stock ? stock : 0,
     };
 
+    console.log("ver nuevo producto:: ", newProduct);
+
     //verificar que todos los campos del producto esten completos
     if(!this.#checkProduct(newProduct)){
       console.log("product error")
@@ -51,11 +52,14 @@ class ProductManager {
     products.push(newProduct);
     await fs.promises.writeFile(this.path, JSON.stringify(products));
     console.log("lista de productos: ", products);
+    return newProduct; 
 
     } catch (error) {
       console.log(error);
     };
   };
+
+
 
   #newId(products){
     console.log("ver tamaño de la array ",products.length < 1) //borrar
@@ -88,8 +92,9 @@ class ProductManager {
     return productById;
   };
 
-  async updateProduct(id, newCodetitle, newDescription, newPrice, newThumbnail, newCode, newStock){
+  async updateProduct(id, product){
 
+    const {title, description, price, thumbnail, code, stock} = product;
     const productById = await this.getProductById(id);
     if(!productById) {
       console.log("error Id Product")
@@ -98,12 +103,12 @@ class ProductManager {
 
     const updateProduct = {
       id : id, 
-      title : newCodetitle, 
-      description : newDescription, 
-      price : newPrice, 
-      thumbnail : newThumbnail, 
-      code : newCode, 
-      stock : newStock
+      title : title, 
+      description : description, 
+      price : price, 
+      thumbnail : thumbnail, 
+      code : code, 
+      stock : stock
     };
 
     console.log("updateProduct: ", updateProduct);
@@ -116,7 +121,8 @@ class ProductManager {
 
     await fs.promises.writeFile(this.path, JSON.stringify(products));
     console.log("lista de productos actualizada: ", products);
-    
+
+    return updateProduct;
   };
 
   async deletecProduct (id){
